@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  app:
+    build: .
+    container_name: social_network-bed
+    restart: always
+    ports:
+      - "8000:8000"
+    command:
+      "gunicorn --workers=2 --timeout 120 --log-level debug --access-logfile  /usr/src/app/logs/gunicorn/access.log --error-logfile /usr/src/app/logs/gunicorn/error.log --worker-connections 3000  --bind=0.0.0.0:8000 rawnn.wsgi:application"
+    volumes:
+      - .:/usr/src/app
+
+  nginx:
+    image: nginx:latest
+    container_name: social_network-web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - app
+
+volumes:
+  redis-data:
+  redis-conf:
